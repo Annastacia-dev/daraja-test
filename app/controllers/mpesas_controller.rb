@@ -20,8 +20,8 @@ class MpesasController < ApplicationController
         'PartyB': business_short_code,
         'PhoneNumber': phoneNumber,
         'CallBackURL': "#{ENV["CALLBACK_URL"]}/callback_url",
-        'AccountReference': 'Trial ROR Mpesa',
-        'TransactionDesc': "ROR trial"
+        'AccountReference': 'Codearn',
+        'TransactionDesc': "Payment for Codearn premium"
         }.to_json
 
         headers = {
@@ -52,41 +52,41 @@ class MpesasController < ApplicationController
     # polling payment
 
     def polling_payment
-        # Check if payment has been paid
-        checkoutId = params[:checkoutId]
+        url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query"
         timestamp = "#{Time.now.strftime "%Y%m%d%H%M%S"}"
         business_short_code = ENV["MPESA_SHORTCODE"]
         password = Base64.strict_encode64("#{business_short_code}#{ENV["MPESA_PASSKEY"]}#{timestamp}")
-        url = ENV['QUERY_URL']
-        headers = {
-          content_type: 'application/json',
-          Authorization: "Bearer #{get_access_token}"
-        }
         payload = {
-          'BusinessShortCode' => business_short_code,
-          'Password' => password,
-          'Timestamp' => timestamp,
-          'CheckoutRequestID' => checkoutId
+        'BusinessShortCode': business_short_code,
+        'Password': password,
+        'Timestamp': timestamp,
+        'CheckoutRequestID': params[:checkoutRequestID]
         }.to_json
+
+        headers = {
+        Content_type: 'application/json',
+        Authorization: "Bearer #{ get_access_token }"
+        }
+
         response = RestClient::Request.new({
-          method: :post,
-          url: url,
-          payload: payload,
-          headers: headers
+        method: :post,
+        url: url,
+        payload: payload,
+        headers: headers
         }).execute do |response, request|
-          case response.code
-          when 500
-            [ :error, JSON.parse(response.to_str) ]
-          when 400
-            [ :error, JSON.parse(response.to_str) ]
-          when 200 
-            [ :success, JSON.parse(response.to_str) ]
-          else
-            fail "Invalid response #{response.to_str} received."
-          end
-         end
-        render json: { msg: response }
-      end
+        case response.code
+        when 500
+        [ :error, JSON.parse(response.to_str) ]
+        when 400
+        [ :error, JSON.parse(response.to_str) ]
+        when 200
+        [ :success, JSON.parse(response.to_str) ]
+        else
+        fail "Invalid response #{response.to_str} received."
+        end
+        end
+        render json: response
+    end
 
     private
 
