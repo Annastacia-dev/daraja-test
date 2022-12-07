@@ -2,13 +2,14 @@ class MpesasController < ApplicationController
     
     require 'rest-client'
 
+    # stkpush
      def stkpush
         phoneNumber = params[:phoneNumber]
         amount = params[:amount]
         url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
         timestamp = "#{Time.now.strftime "%Y%m%d%H%M%S"}"
         business_short_code = ENV["MPESA_SHORTCODE"]
-        password = "MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMjIxMjA2MDgzOTE0"
+        password = Base64.strict_encode64("#{business_short_code}#{ENV["MPESA_PASSKEY"]}#{timestamp}")
         payload = {
         'BusinessShortCode': business_short_code,
         'Password': password,
@@ -25,7 +26,7 @@ class MpesasController < ApplicationController
 
         headers = {
         Content_type: 'application/json',
-        Authorization: "Bearer 6wruSAHJFGcWFL6JG4AFah1vWeBt"
+        Authorization: "Bearer #{get_access_token}"
         }
 
         response = RestClient::Request.new({
@@ -46,9 +47,46 @@ class MpesasController < ApplicationController
         end
         end
         render json: response
-
-
     end
+
+    # polling payment
+
+    def polling_payment
+        # Check if payment has been paid
+        checkoutId = params[:checkoutId]
+        timestamp = "#{Time.now.strftime "%Y%m%d%H%M%S"}"
+        business_short_code = ENV["MPESA_SHORTCODE"]
+        password = Base64.strict_encode64("#{business_short_code}#{ENV["MPESA_PASSKEY"]}#{timestamp}")
+        url = ENV['QUERY_URL']
+        headers = {
+          content_type: 'application/json',
+          Authorization: "Bearer #{get_access_token}"
+        }
+        payload = {
+          'BusinessShortCode' => business_short_code,
+          'Password' => password,
+          'Timestamp' => timestamp,
+          'CheckoutRequestID' => checkoutId
+        }.to_json
+        response = RestClient::Request.new({
+          method: :post,
+          url: url,
+          payload: payload,
+          headers: headers
+        }).execute do |response, request|
+          case response.code
+          when 500
+            [ :error, JSON.parse(response.to_str) ]
+          when 400
+            [ :error, JSON.parse(response.to_str) ]
+          when 200 
+            [ :success, JSON.parse(response.to_str) ]
+          else
+            fail "Invalid response #{response.to_str} received."
+          end
+         end
+        render json: { msg: response }
+      end
 
     private
 
@@ -57,7 +95,7 @@ class MpesasController < ApplicationController
         @consumer_key = ENV['MPESA_CONSUMER_KEY']
         @consumer_secret = ENV['MPESA_CONSUMER_SECRET']
         @userpass = Base64::strict_encode64("#{@consumer_key}:#{@consumer_secret}")
-        @headers = {
+        headers = {
             Authorization: "Bearer #{@userpass}"
         }
         res = RestClient::Request.execute( url: @url, method: :get, headers: {

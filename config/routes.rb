@@ -6,9 +6,6 @@ Rails.application.routes.draw do
   # root "articles#index"
 
   post "/stkpush", to: "mpesas#stkpush"
-
-  # post "/callback_url", to: "mpesas#callback_url"
-
   post "/polling_payment", to: "mpesas#polling_payment"
 
 
