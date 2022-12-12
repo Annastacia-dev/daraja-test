@@ -49,9 +49,9 @@ class MpesasController < ApplicationController
         render json: response
     end
 
-    # polling payment
+    # stkquery
 
-    def polling_payment
+    def stkquery
         url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query"
         timestamp = "#{Time.now.strftime "%Y%m%d%H%M%S"}"
         business_short_code = ENV["MPESA_SHORTCODE"]

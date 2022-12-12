@@ -12,6 +12,7 @@ Rails.application.configure do
   config.hosts.clear
 
   # allow ngrok to work
+  # config.hosts << /[a-z0-9]+\.ngrok\.io/
 
 
 
