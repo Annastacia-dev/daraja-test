@@ -2,6 +2,16 @@ class MpesasController < ApplicationController
     
     require 'rest-client'
 
+    # add this to handle callbackurl otherwise you'll get an InvalidCallback URL
+    #also add routes for this
+    def callback
+        request_body = request.body.read
+        process_callback(request_body)
+        render json: { status: 'success' }
+    end
+
+      
+
     # stkpush
      def stkpush
         phoneNumber = params[:phoneNumber]
@@ -18,8 +28,8 @@ class MpesasController < ApplicationController
         'Amount': amount,
         'PartyA': phoneNumber,
         'PartyB': business_short_code,
-        'PhoneNumber': phoneNumber,
-        'CallBackURL': "#{ENV["CALLBACK_URL"]}/callback_url",
+        'PhoneNumber': phoneNumber,        
+        'CallBackURL': "#{ENV["CALLBACK_URL"]}/callback",        
         'AccountReference': 'Codearn',
         'TransactionDesc': "Payment for Codearn premium"
         }.to_json
