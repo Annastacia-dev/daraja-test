@@ -1,5 +1,4 @@
 class MpesasController < ApplicationController
-    
     require 'rest-client'
 
     # stkpush
