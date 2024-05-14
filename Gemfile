@@ -36,3 +36,4 @@ gem "cors", "~> 1.0"
 gem "rack-cors", "~> 1.1"
 gem 'uri'
 gem 'json'
+gem 'dotenv'

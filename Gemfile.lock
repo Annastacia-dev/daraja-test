@@ -76,6 +76,7 @@ GEM
       reline (>= 0.3.1)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
+    dotenv (2.8.1)
     erubi (1.11.0)
     globalid (1.0.0)
       activesupport (>= 5.0)
@@ -178,6 +179,7 @@ PLATFORMS
 DEPENDENCIES
   cors (~> 1.0)
   debug
+  dotenv
   json
   puma (~> 5.0)
   rack (~> 2.2)
