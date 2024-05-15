@@ -2,7 +2,6 @@ module Mpesas::Stkquery
   extend ActiveSupport::Concern
 
   def stkquery
-    url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query"
     payload = {
     'BusinessShortCode': @short_code,
     'Password': @password,
@@ -17,7 +16,7 @@ module Mpesas::Stkquery
 
     response = RestClient::Request.new({
     method: :post,
-    url: url,
+    url: @stk_query_url,
     payload: payload,
     headers: headers
     }).execute do |response, request|
