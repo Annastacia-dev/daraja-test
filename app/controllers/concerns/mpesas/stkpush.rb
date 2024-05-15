@@ -16,21 +16,23 @@ module Mpesas
 
     private
 
+    # rubocop:disable Metrics/MethodLength
     def generate_stkpush_payload(phone_number, amount)
       {
-        'BusinessShortCode': @short_code,
-        'Password': @password,
-        'Timestamp': @timestamp,
-        'TransactionType': 'CustomerPayBillOnline',
-        'Amount': amount,
-        'PartyA': phone_number,
-        'PartyB': @short_code,
-        'PhoneNumber': phone_number,
-        'CallBackURL': "#{@callback_url}/callback_url",
-        'AccountReference': 'Rails Daraja',
-        'TransactionDesc': 'Integration of Daraja API in Rails'
+        BusinessShortCode: @short_code,
+        Password: @password,
+        Timestamp: @timestamp,
+        TransactionType: 'CustomerPayBillOnline',
+        Amount: amount,
+        PartyA: phone_number,
+        PartyB: @short_code,
+        PhoneNumber: phone_number,
+        CallBackURL: "#{@callback_url}/callback_url",
+        AccountReference: 'Rails Daraja',
+        TransactionDesc: 'Integration of Daraja API in Rails'
       }.to_json
     end
+    # rubocop:enable Metrics/MethodLength
 
     def send_stkpush_request(payload, headers)
       RestClient::Request.new(

@@ -20,10 +20,10 @@ module Mpesas
 
     def generate_query_payload(checkout_request_id)
       {
-        'BusinessShortCode': @short_code,
-        'Password': @password,
-        'Timestamp': @timestamp,
-        'CheckoutRequestID': checkout_request_id
+        BusinessShortCode: @short_code,
+        Password: @password,
+        Timestamp: @timestamp,
+        CheckoutRequestID: checkout_request_id
       }.to_json
     end
 

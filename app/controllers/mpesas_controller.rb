@@ -37,9 +37,7 @@ class MpesasController < ApplicationController
 
   def handle_response(response)
     case response.code
-    when 500
-      [:error, JSON.parse(response.to_str)]
-    when 400
+    when 500, 400
       [:error, JSON.parse(response.to_str)]
     when 200
       [:success, JSON.parse(response.to_str)]
