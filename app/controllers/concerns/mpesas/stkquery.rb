@@ -32,8 +32,8 @@ module Mpesas
         {
           method: :post,
           url: @stk_query_url,
-          payload: payload,
-          headers: headers
+          payload:,
+          headers:
         }
       ).execute do |response, _request|
         handle_response(response)

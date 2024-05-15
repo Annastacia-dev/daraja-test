@@ -1,2 +1,0 @@
-class AccessToken < ApplicationRecord
-end
