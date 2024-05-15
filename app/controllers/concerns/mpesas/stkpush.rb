@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# Merchant initiated request (C2B), send a payment prompt on the customer's phone (Popularly known as STK Push Prompt)
+
 module Mpesas::Stkpush
   extend ActiveSupport::Concern
 
@@ -20,7 +24,7 @@ module Mpesas::Stkpush
 
     headers = {
     Content_type: 'application/json',
-    Authorization: "Bearer #{get_access_token}"
+    Authorization: "Bearer #{access_token}"
     }
 
     response = RestClient::Request.new({

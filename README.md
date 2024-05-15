@@ -105,7 +105,7 @@ private
         res
     end
 
-    def get_access_token
+    def access_token
         res = generate_access_token_request()
         if res.code != 200
         r = generate_access_token_request()
@@ -163,7 +163,7 @@ private
 
         headers = {
         Content_type: 'application/json',
-        Authorization: "Bearer #{get_access_token}"
+        Authorization: "Bearer #{access_token}"
         }
 
         response = RestClient::Request.new({
@@ -236,7 +236,7 @@ def stkquery
 
         headers = {
         Content_type: 'application/json',
-        Authorization: "Bearer #{ get_access_token }"
+        Authorization: "Bearer #{ access_token }"
         }
 
         response = RestClient::Request.new({
@@ -314,7 +314,7 @@ class MpesasController < ApplicationController
 
         headers = {
         Content_type: 'application/json',
-        Authorization: "Bearer #{get_access_token}"
+        Authorization: "Bearer #{access_token}"
         }
 
         response = RestClient::Request.new({
@@ -353,7 +353,7 @@ class MpesasController < ApplicationController
 
         headers = {
         Content_type: 'application/json',
-        Authorization: "Bearer #{ get_access_token }"
+        Authorization: "Bearer #{ access_token }"
         }
 
         response = RestClient::Request.new({
@@ -392,7 +392,7 @@ class MpesasController < ApplicationController
         res
     end
 
-    def get_access_token
+    def access_token
         res = generate_access_token_request()
         if res.code != 200
         r = generate_access_token_request()

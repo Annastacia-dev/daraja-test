@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# Check the status of a Lipa Na M-Pesa Online Payment.
+
 module Mpesas::Stkquery
   extend ActiveSupport::Concern
 
@@ -11,7 +15,7 @@ module Mpesas::Stkquery
 
     headers = {
     Content_type: 'application/json',
-    Authorization: "Bearer #{ get_access_token }"
+    Authorization: "Bearer #{ access_token }"
     }
 
     response = RestClient::Request.new({
