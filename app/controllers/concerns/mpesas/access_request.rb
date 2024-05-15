@@ -2,7 +2,7 @@
 
 module Mpesas
   # Makes a request for a time bound access token to call allowed APIs
-  class AccessRequest
+  module AccessRequest
     private
 
     def generate_access_token_request
@@ -10,31 +10,22 @@ module Mpesas
         url: @auth_url,
         method: :get,
         headers: {
-          Authorization: "Bearer #{@userpass}"
+          Authorization: "Basic #{@userpass}"
         }
       )
     end
 
-    def access_token
+    def retrieve_access_token
       res = send_access_token_request
       raise MpesaError, 'Unable to generate access token' if res.code != 200
 
-      body = JSON.parse(res.body, symbolize_names: true)
-      token = body[:access_token]
-
-      store_access_token(token)
-
-      token
+      body = JSON.parse(res, { symbolize_names: true })
+      body[:access_token]
     end
 
     def send_access_token_request
       res = generate_access_token_request
       res.code == 200 ? res : generate_access_token_request
-    end
-
-    def store_access_token(token)
-      AccessToken.destroy_all
-      AccessToken.create!(token)
     end
   end
 end

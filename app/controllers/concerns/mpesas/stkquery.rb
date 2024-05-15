@@ -1,40 +1,43 @@
 # frozen_string_literal: true
 
-# Check the status of a Lipa Na M-Pesa Online Payment.
+module Mpesas
+  # Check the status of a Lipa Na M-Pesa Online Payment.
+  module Stkquery
+    extend ActiveSupport::Concern
 
-module Mpesas::Stkquery
-  extend ActiveSupport::Concern
+    def stkquery
+      checkout_request_id = params[:checkout_request_id]
 
-  def stkquery
-    payload = {
-    'BusinessShortCode': @short_code,
-    'Password': @password,
-    'Timestamp': @timestamp,
-    'CheckoutRequestID': params[:checkoutRequestID]
-    }.to_json
+      payload = generate_query_payload(checkout_request_id)
 
-    headers = {
-    Content_type: 'application/json',
-    Authorization: "Bearer #{ access_token }"
-    }
+      headers = generate_headers
 
-    response = RestClient::Request.new({
-    method: :post,
-    url: @stk_query_url,
-    payload: payload,
-    headers: headers
-    }).execute do |response, request|
-    case response.code
-    when 500
-    [ :error, JSON.parse(response.to_str) ]
-    when 400
-    [ :error, JSON.parse(response.to_str) ]
-    when 200
-    [ :success, JSON.parse(response.to_str) ]
-    else
-    fail "Invalid response #{response.to_str} received."
+      response = send_query_request(payload, headers)
+      render json: response
     end
+
+    private
+
+    def generate_query_payload(checkout_request_id)
+      {
+        'BusinessShortCode': @short_code,
+        'Password': @password,
+        'Timestamp': @timestamp,
+        'CheckoutRequestID': checkout_request_id
+      }.to_json
     end
-    render json: response
-end
+
+    def send_query_request(payload, headers)
+      RestClient::Request.new(
+        {
+          method: :post,
+          url: @stk_query_url,
+          payload: payload,
+          headers: headers
+        }
+      ).execute do |response, _request|
+        handle_response(response)
+      end
+    end
+  end
 end

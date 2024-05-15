@@ -105,7 +105,7 @@ private
         res
     end
 
-    def access_token
+    def get_access_token
         res = generate_access_token_request()
         if res.code != 200
         r = generate_access_token_request()
