@@ -1,123 +1,48 @@
+# frozen_string_literal: true
+
+# Logic for all Mpesa related tasks
 class MpesasController < ApplicationController
-    
-    require 'rest-client'
+  before_action :load_variables
+  before_action :load_urls
 
-    # stkpush
-     def stkpush
-        phoneNumber = params[:phoneNumber]
-        amount = params[:amount]
-        url = "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest"
-        timestamp = "#{Time.now.strftime "%Y%m%d%H%M%S"}"
-        business_short_code = ENV["MPESA_SHORTCODE"]
-        password = Base64.strict_encode64("#{business_short_code}#{ENV["MPESA_PASSKEY"]}#{timestamp}")
-        payload = {
-        'BusinessShortCode': business_short_code,
-        'Password': password,
-        'Timestamp': timestamp,
-        'TransactionType': "CustomerPayBillOnline",
-        'Amount': amount,
-        'PartyA': phoneNumber,
-        'PartyB': business_short_code,
-        'PhoneNumber': phoneNumber,
-        'CallBackURL': "#{ENV["CALLBACK_URL"]}/callback_url",
-        'AccountReference': 'Codearn',
-        'TransactionDesc': "Payment for Codearn premium"
-        }.to_json
+  include Mpesas::AccessRequest
+  include Mpesas::Stkpush
+  include Mpesas::Stkquery
 
-        headers = {
-        Content_type: 'application/json',
-        Authorization: "Bearer #{get_access_token}"
-        }
+  private
 
-        response = RestClient::Request.new({
-        method: :post,
-        url: url,
-        payload: payload,
-        headers: headers
-        }).execute do |response, request|
-        case response.code
-        when 500
-        [ :error, JSON.parse(response.to_str) ]
-        when 400
-        [ :error, JSON.parse(response.to_str) ]
-        when 200
-        [ :success, JSON.parse(response.to_str) ]
-        else
-        fail "Invalid response #{response.to_str} received."
-        end
-        end
-        render json: response
+  def load_variables
+    @consumer_key = ENV.fetch('MPESA_CONSUMER_KEY')
+    @consumer_secret = ENV.fetch('MPESA_CONSUMER_SECRET')
+    @short_code = ENV.fetch('MPESA_SHORTCODE')
+    @passkey = ENV.fetch('MPESA_PASSKEY')
+    @timestamp = Time.now.strftime('%Y%m%d%H%M%S').to_s
+    @password = Base64.strict_encode64("#{@short_code}#{@passkey}#{@timestamp}")
+    @userpass = Base64.strict_encode64("#{@consumer_key}:#{@consumer_secret}")
+  end
+
+  def load_urls
+    @auth_url =  ENV.fetch('AUTH_URL')
+    @stkpush_url = ENV.fetch('STKPUSH_URL')
+    @callback_url = ENV.fetch('CALLBACK_URL')
+    @stk_query_url = ENV.fetch('STKQUERY_URL')
+  end
+
+  def generate_headers
+    {
+      Content_type: 'application/json',
+      Authorization: "Bearer #{retrieve_access_token}"
+    }
+  end
+
+  def handle_response(response)
+    case response.code
+    when 500, 400
+      [:error, JSON.parse(response.to_str)]
+    when 200
+      [:success, JSON.parse(response.to_str)]
+    else
+      raise "Invalid response #{response.to_str} received."
     end
-
-    # stkquery
-
-    def stkquery
-        url = "https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query"
-        timestamp = "#{Time.now.strftime "%Y%m%d%H%M%S"}"
-        business_short_code = ENV["MPESA_SHORTCODE"]
-        password = Base64.strict_encode64("#{business_short_code}#{ENV["MPESA_PASSKEY"]}#{timestamp}")
-        payload = {
-        'BusinessShortCode': business_short_code,
-        'Password': password,
-        'Timestamp': timestamp,
-        'CheckoutRequestID': params[:checkoutRequestID]
-        }.to_json
-
-        headers = {
-        Content_type: 'application/json',
-        Authorization: "Bearer #{ get_access_token }"
-        }
-
-        response = RestClient::Request.new({
-        method: :post,
-        url: url,
-        payload: payload,
-        headers: headers
-        }).execute do |response, request|
-        case response.code
-        when 500
-        [ :error, JSON.parse(response.to_str) ]
-        when 400
-        [ :error, JSON.parse(response.to_str) ]
-        when 200
-        [ :success, JSON.parse(response.to_str) ]
-        else
-        fail "Invalid response #{response.to_str} received."
-        end
-        end
-        render json: response
-    end
-
-    private
-
-    def generate_access_token_request
-        @url = "https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials"
-        @consumer_key = ENV['MPESA_CONSUMER_KEY']
-        @consumer_secret = ENV['MPESA_CONSUMER_SECRET']
-        @userpass = Base64::strict_encode64("#{@consumer_key}:#{@consumer_secret}")
-        headers = {
-            Authorization: "Bearer #{@userpass}"
-        }
-        res = RestClient::Request.execute( url: @url, method: :get, headers: {
-            Authorization: "Basic #{@userpass}"
-        })
-        res
-    end
-
-    def get_access_token
-        res = generate_access_token_request()
-        if res.code != 200
-        r = generate_access_token_request()
-        if res.code != 200
-        raise MpesaError('Unable to generate access token')
-        end
-        end
-        body = JSON.parse(res, { symbolize_names: true })
-        token = body[:access_token]
-        AccessToken.destroy_all()
-        AccessToken.create!(token: token)
-        token
-    end
-
-
+  end
 end
