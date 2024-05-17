@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "home#index"
 
+  get '/:action', to: 'home#action'
+
   post '/stkpush', to: 'mpesas#stkpush'
   post '/stkquery', to: 'mpesas#stkquery'
 end

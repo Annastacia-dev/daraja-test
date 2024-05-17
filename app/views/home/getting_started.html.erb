@@ -1,0 +1,47 @@
+<div class="pt-10 px-5 flex flex-col gap-5">
+
+<%= debug params %>
+
+  <h1 class="text-2xl  tracking-wide text-green-500 capitalize"> getting started </h1>
+
+  <div class="grid lg:grid-cols-3 lg:gap-20 gap-5">
+      <div class="flex flex-col gap-5 col-span-2">
+        <h5 class="font-bold text-lg">Daraja</h5>
+        <div class='flex flex-col gap-2'>
+          <p class="leading-8 text-sm">
+            - To get started head over to <a href="https://developer.safaricom.co.ke" target="_blank" class="text-link">daraja</a> and sign up for a developer account or login if you already have one.
+          </p>
+          <p class="leading-8 text-sm">
+            - On my apps tab, create a new sandbox app and give it a name, select the products you want to map to the app and click on create app. You can't add products after the app is created, be sure to select the one's you need.
+          </p>
+          <p class="leading-8 text-sm">
+            - Your newly created app will appear and will list the products you selected, along with your credentials a
+            <span class="pre">consumer key</span> and a
+            <span class="pre">consumer secret</span>
+          </p>
+          <p class="leading-8 text-sm">
+            - Store this these in a <span class="pre">.env</span> or your credentials file.
+          </p>
+          <p class="leading-8 text-sm">
+            Here is a sample <span class="pre">.env</span>
+          </p>
+          <div class="pre p-5 flex flex-col">
+            <span>MPESA_CONSUMER_KEY='your consumer key'</span>
+            <span>MPESA_CONSUMER_SECRET='your consumer secret'</span>
+            <span>MPESA_SHORTCODE=174379</span>
+            <span>MPESA_PASSKEY='bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'</span>
+          </div>
+          <p class="leading-8 text-sm mt-4">
+            <span class="font-bold text-tertiary">NOTE</span>
+            <br />
+            - The <span class="pre uppercase">MPESA_SHORTCODE</span> and <span class="pre uppercase">MPESA_PASSKEY</span>  provided above are only for testing, to go live you'll have to get a shortcode (A Paybill, Buy Goods or Till Number) and passkey from M-pesa .
+            <br />
+            - <span class="pre uppercase">MPESA_PASSKEY</span> is only required if your app has Lipa na M-Pesa product or M-Pesa express product.
+          </p>
+        </div>
+      </div>
+      <%= image_tag 'app.png'%>
+  </div>
+
+  <%= render 'shared/bottom_nav' %>
+</div>
