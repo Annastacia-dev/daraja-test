@@ -8,6 +8,6 @@
 @layer components {
   html{
     scroll-behavior: smooth;
-    @apply font-roboto;
+    @apply font-roboto font-light;
   }
 }
