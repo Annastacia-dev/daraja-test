@@ -7,6 +7,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '3.2.2'
 
 gem 'dotenv', '~> 3.1', '>= 3.1.2'
+gem "importmap-rails"
 gem 'json', '~> 2.7', '>= 2.7.2'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 6.4', '>= 6.4.2'

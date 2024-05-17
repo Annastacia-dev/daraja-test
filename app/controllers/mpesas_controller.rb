@@ -2,6 +2,7 @@
 
 # Logic for all Mpesa related tasks
 class MpesasController < ApplicationController
+  skip_before_action :verify_authenticity_token
   before_action :load_variables
   before_action :load_urls
 
