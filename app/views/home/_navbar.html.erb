@@ -1,0 +1,25 @@
+<nav class="bg-secondary  text-white relative">
+
+  <div class="flex justify-between items-center">
+    <div class="hidden md:flex text-sm font-semibold">
+      <%= link_to root_path,  class: "flex gap-2 items-center justify-center p-4 hover:bg-black/10"  do %>
+        <i class="fa-solid fa-house"></i>
+        <span class="mt-1">Home</span>
+      <% end %>
+    </div>
+
+    <div class="md:hidden p-3">
+      <button class="text-white focus:outline-none" onclick="document.getElementById('mobile-menu').classList.toggle('hidden'); document.getElementById('menu-closed').classList.toggle('hidden'); document.getElementById('menu-open').classList.toggle('hidden')">
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="menu-closed">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+          <svg class="h-6 w-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="menu-open">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <%= render 'mobile_menu' %>
+</nav>
