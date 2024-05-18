@@ -1,0 +1,78 @@
+<div class="pt-10 px-5 flex flex-col gap-10">
+  <h1 class="text-2xl  tracking-wide text-green-500 capitalize"> M-pesa express </h1>
+  <p class="text-sm"> - This is a Merchant/Business initiated C2B (Customer to Business) Payment.</p>
+  <p class="text-sm"> - It has two parts to it, sending the payment prompt & making a query to check the status of the request.</p>
+
+  <div class="grid lg:grid-cols-3 lg:gap-20 gap-5">
+    <div class="flex flex-col gap-5 col-span-2">
+      <h5 class="font-bold text-lg">Sending the prompt</h5>
+      <div class='flex flex-col gap-2'>
+        <p class="leading-8 text-sm">
+          - Making a simulation on the <a href="https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate" class="text-link" target="_blank">daraja portal</a>, we see that we need to pass a few things:
+          <ol class="text-sm flex flex-col gap-2">
+            <li class="font-semibold"> Headers </li>
+            <p> - A key <span>Authorization</span> with a value of Bearer + the access token</p>
+            <li class="font-semibold"> Body (JSON) </li>
+            <div class="pre p-3">
+              {
+                <br/>
+                "BusinessShortCode": 174379, - (organization's shortcode (Paybill or Buygoods - A 5 to 6-digit account number) used to identify an organization and receive the transaction.)
+                <br/>
+                <br/>
+                "Password": "your password", -(A base64 encoded string. (The base64 string is a combination of Shortcode+Passkey+Timestamp))
+                <br/>
+                <br/>
+                "Timestamp": "20240518203935", - (current time of the transaction in the format YYYYMMDDHHMMSS)
+                <br/>
+                <br/>
+                "TransactionType": "CustomerPayBillOnline", - ("CustomerPayBillOnline" for PayBill Numbers and "CustomerBuyGoodsOnline" for Till Numbers.)
+                <br/>
+                <br/>
+                "Amount": 1, - (Amount transacted normally a numeric value. Only whole numbers are supported.)
+                <br/>
+                <br/>
+                "PartyA": 2547xxxxxxxx, - (The phone number sending money.A Valid Safaricom Mobile Number that is M-PESA registered in the format 2547XXXXXXXX)
+                <br/>
+                <br/>
+                "PartyB": 174379, - (Same as the BusinessShortCode value above)
+                <br/>
+                <br/>
+                "PhoneNumber": 2547xxxxxxxx, -(Mobile Number to receive the STK Pin Prompt. Can be the same as PartyA value above.)
+                <br/>
+                <br/>
+                "CallBackURL": "https://mydomain.com/path", -(A valid secure URL that is used to receive notifications from M-Pesa API)
+                <br/>
+                <br/>
+                "AccountReference": "CompanyXLTD", -(Identifier of the transaction for the transaction displayed to the customer in the STK Pin Prompt message. Maximum of 12 alphanumeric characters.)
+                <br/>
+                <br/>
+                "TransactionDesc": "Payment of X" - (Additional information/comment that can be sent along with the request from your system. Maximum of 13 Characters.)
+                <br/>
+              }
+            </div>
+          </ol>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-5">
+      <div class="bg-white shadow-lg rounded-lg p-6 w-80">
+        <h2 class="text-2xl font-bold mb-4 text-center">Try it Out</h2>
+        <%= form_with url: stkpush_path, method: :post, local: true do |form| %>
+            <div class="mb-4">
+              <%= form.label :phone_number, class: 'block text-gray-700 text-sm font-bold mb-2' %>
+              <%= form.text_field :phone_number, placeholder: 'e.g. 2547xxxxxxx', class: 'appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', required: true %>
+            </div>
+            <div class="mb-4">
+              <%= form.label :amount, class: 'block text-gray-700 text-sm font-bold mb-2' %>
+              <%= form.number_field :amount, placeholder: 'e.g., 100', class: 'appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', required: true %>
+            </div>
+
+            <%= form.submit 'Submit', class: 'bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-5 cursor-pointer' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%= render 'shared/bottom_nav', text: 'Explore other products integration' %>
+</div>

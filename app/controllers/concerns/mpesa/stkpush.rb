@@ -7,11 +7,24 @@ module Mpesa
       phone_number = params[:phone_number]
       amount = params[:amount]
 
-      payload = generate_stkpush_payload(phone_number, amount)
-      headers = generate_headers
-
-      response = send_stkpush_request(payload, headers)
-      render json: response
+      respond_to do |format|
+        if phone_number.blank? || amount.blank?
+          format.html { redirect_to mpesa_express_path, alert: 'Phone number or amount is blank' }
+          format.json { render json: { message: 'Error: Phone number or amount is blank '} }
+        else
+          regex = /\A2547\d{8}\z/
+          if regex.match?(phone_number)
+            payload = generate_stkpush_payload(phone_number, amount)
+            headers = generate_headers
+            response = send_stkpush_request(payload, headers)
+            format.html { redirect_to mpesa_express_path, notice: 'Request in progress'}
+            format.json { render json: response }
+          else
+            format.html { redirect_to mpesa_express_path, alert: 'Phone number format is invalid should be in the format 2547xxxxxxx' }
+            format.json { render json: { message: 'Error: Phone number format is invalid should be in the format 2547xxxxxxx '} }
+          end
+        end
+      end
     end
 
     private

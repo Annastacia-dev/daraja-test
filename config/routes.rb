@@ -7,7 +7,8 @@ Rails.application.routes.draw do
   root "home#index"
 
   get '/:action', to: 'home#action'
+  get '/mpesa_express', to: 'home#mpesa_express'
 
-  post '/stkpush', to: 'mpesa#stkpush'
-  post '/stkquery', to: 'mpesa#stkquery'
+  post '/stkpush', to: 'mpesa#stkpush', as: 'stkpush'
+  post '/stkquery', to: 'mpesa#stkquery', as: 'stkquery'
 end
