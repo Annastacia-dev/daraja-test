@@ -10,7 +10,7 @@
            - Making a simulation on the <a href="https://developer.safaricom.co.ke/APIs/Authorization" class="text-link" target="_blank">daraja portal</a>, we see that we need to pass two values in our headers a key <span> Authorization </span> and value a Base64 encode of the consumer key: consumer secret.
           </p>
           <p class="leading-8 text-sm">
-           Add <span class='pre'> gem rest-client </span> and <span class='pre'> gem dotenv </span> to your <span class='pre'> Gemfile </span> and run <span class='pre'> bundle </span> to install them.<span class="pre">rest-client</span> will enable us make HTTP requests to the API endpoints and <span class="pre">dotenv</span> is to load environment variables from <span class="pre">.env</span>.
+           - Add <span class='pre'> gem rest-client </span> and <span class='pre'> gem dotenv </span> to your <span class='pre'> Gemfile </span> and run <span class='pre'> bundle </span> to install them.<span class="pre">rest-client</span> will enable us make HTTP requests to the API endpoints and <span class="pre">dotenv</span> is to load environment variables from <span class="pre">.env</span>.
           </p>
           <p class="leading-8 text-sm">
             - Let's generate a controller to write all our logic <span class="pre"> rails g controller mpesa </span>.
@@ -31,7 +31,10 @@
            </div>
           </p>
           <p class="leading-8 text-sm">
-           - Let's abstract the authorization request code to a concern to keep our controller clean. Create a concern file <span class="pre"> app/controllers/concerns/access_request.rb</span>
+           - We'll also define a <span class="pre">@userpass</span> variable that encodes the <span class="pre">@consumer_key</span> and <span class="pre">@consumer_secret</span> using Base64 format.
+          </p>
+          <p class="leading-8 text-sm">
+           - Let's abstract the authorization request code to a concern to keep our controller clean. Create a concern file <span class="pre"> app/controllers/concerns/mpesa/access_request.rb</span>
            <div class="pre text-sm p-3">
             module Mpesa
               <br/>
@@ -44,19 +47,37 @@
            </p>
            <p class="leading-8 text-sm">
            then include it in your <span class="pre"> app/controllers/mpesa_controller</span> file <span class="pre">include Mpesa::AccessRequest</span>
+           </p>
+           <p class="leading-8 text-sm">
+           - We will define two <span class="pre"> private </span> methods here:
           </p>
-          <p class="leading-8 text-sm">
-            - <span class='pre'>generate_access_token</span>, gives you a time bound access token to call allowed APIs in the sandbox.
+          <p class="leading-8 text-sm ml-4">
+            <span class='pre'>generate_access_token</span> - gives you a time bound access token to call allowed APIs in the sandbox.
           </p>
-          <p class="leading-8 text-sm">
-            - <span class='pre'>retrieve_access_token</span>, used to check if generate_access_token is successful or not then it reads the responses and extracts the access token from the response and saves it to the database.
+          <p class="leading-8 text-sm ml-4">
+            <span class='pre'>retrieve_access_token</span> - used to check if generate_access_token is successful or not then it reads the responses and extracts the access token from the response and saves it to the database.
+          </p>
+          <p class="leading-8 text-sm ml-4">
+            - The response from the request looks like this:
+          </p>
+          <div class="pre text-sm p-3">
+            {
+            <br />
+              <span class="ml-4">"access_token": "CXJ0mlRGmsnwokUxUYzWAWvCIXfs"</span>
+              <br />
+              <span class="ml-4">"expires_in": "3599"</span>
+              <br />
+            }
+          </div>
+          <p class="leading-8 text-sm ml-4">
+            - Since the token is valid for an hour you can choose to store it in your database and use it, and make a request for a new one every hour or make a request for a new token for every request. For this implementation we will be making a new token request for each call.
           </p>
         </div>
       </div>
       <div class="flex flex-col gap-5">
         <p class="italic">app/controllers/mpesa_controller.rb</p>
-        <div class="pre p-5">
-            class MpesasController < ApplicationController
+        <div class="pre p-5 text-sm">
+            class MpesaController < ApplicationController
               <br/>
               <span class="ml-2">skip_before_action :verify_authenticity_token</span>
               <br/>
@@ -78,7 +99,64 @@
                 <br />
                 <span class="ml-4">@consumer_secret = ENV.fetch('MPESA_CONSUMER_SECRET')</span>
                 <br />
+                <span class="ml-4">@userpass = Base64.strict_encode64("#{@consumer_key}:#{@consumer_secret}")</span>
+                <br />
                 <span class="ml-2">end</span>
+              <br />
+            end
+        </div>
+
+        <p class="italic mt-10">app/controllers/concerns/mpesa/access_request.rb</p>
+        <div class="pre p-5 text-sm">
+            module Mpesa
+              <br/>
+              <span class="ml-2">module AccessRequest</span>
+              <br />
+              <span class="ml-4">private</span>
+              <br />
+              <br />
+
+              <span class="ml-4"> def generate_access_token_request</span>
+              <span class="ml-8">RestClient::Request.execute(</span>
+              <br />
+              <span class="ml-12 wrap">url: 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials',</span>
+              <br />
+              <span class="ml-12">method: :get,</span>
+              <br />
+              <span class="ml-12">headers: {</span>
+              <br />
+              <span class="ml-16">Authorization: "Basic #{@userpass}"</span>
+              <br />
+              <span class="ml-12">}</span>
+              <br />
+              <span class="ml-8">)</span>
+              <br />
+              <span class="ml-4">end</span>
+              <br />
+              <br />
+
+              <span class="ml-4">def retrieve_access_token</span>
+              <br />
+              <span class="ml-8">res = send_access_token_request</span>
+              <br />
+              <span class="ml-4">raise MpesaError, 'Unable to generate access token' if res.code != 200</span>
+              <br />
+              <span class="ml-8">body = JSON.parse(res, { symbolize_names: true })</span>
+              <br />
+              <span class="ml-8">body[:access_token]</span>
+              <br />
+              <span class="ml-4">end</span>
+              <br />
+              <br />
+              <span class="ml-4">def send_access_token_request</span>
+              <br />
+              <span class="ml-8">res = generate_access_token_request</span>
+              <br />
+              <span class="ml-8">res.code == 200 ? res : generate_access_token_request</span>
+              <br />
+              <span class="ml-4">end</span>
+              <br />
+              <span class="ml-2">end</span>
               <br />
             end
         </div>
