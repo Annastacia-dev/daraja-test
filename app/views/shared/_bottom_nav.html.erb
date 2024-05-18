@@ -1,5 +1,5 @@
 <nav class="pt-20 pb-10">
-  <h5 class="font-semibold text-primary"> More Links </h5>
+    <h5 class="font-semibold text-primary">  <%= text.try(:presence) || "More Links" %> </h5>
    <hr class="my-6" />
   <ul class="flex gap-10">
     <% bottom_links.each_with_index do |link, index| %>

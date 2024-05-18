@@ -3,43 +3,80 @@
   <h1 class="text-2xl  tracking-wide text-green-500 capitalize"> getting started </h1>
 
   <div class="grid lg:grid-cols-3 lg:gap-20 gap-5">
-      <div class="flex flex-col gap-5 col-span-2">
-        <h5 class="font-bold text-lg">Daraja</h5>
-        <div class='flex flex-col gap-2'>
-          <p class="leading-8 text-sm">
-            - To get started head over to <a href="https://developer.safaricom.co.ke" target="_blank" class="text-link">daraja</a> and sign up for a developer account or login if you already have one.
-          </p>
-          <p class="leading-8 text-sm">
-            - On my apps tab, create a new sandbox app and give it a name, select the products you want to map to the app and click on create app. You can't add products after the app is created, be sure to select the one's you need.
-          </p>
-          <p class="leading-8 text-sm">
-            - Your newly created app will appear and will list the products you selected, along with your credentials a
-            <span class="pre">consumer key</span> and a
-            <span class="pre">consumer secret</span>
-          </p>
-          <p class="leading-8 text-sm">
-            - Store this these in a <span class="pre">.env</span> or your credentials file.
-          </p>
-          <p class="leading-8 text-sm">
-            Here is a sample <span class="pre">.env</span>
-          </p>
-          <div class="pre p-5 flex flex-col">
-            <span>MPESA_CONSUMER_KEY='your consumer key'</span>
-            <span>MPESA_CONSUMER_SECRET='your consumer secret'</span>
-            <span>MPESA_SHORTCODE=174379</span>
-            <span>MPESA_PASSKEY='bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919'</span>
+      <div class="flex flex-col gap-20 col-span-2">
+
+        <div class="flex flex-col gap-5">
+          <h5 class="font-bold text-lg">Daraja</h5>
+          <div class='flex flex-col gap-2'>
+            <p class="leading-8 text-sm">
+              - To get started head over to <a href="https://developer.safaricom.co.ke" target="_blank" class="text-link">daraja</a> and sign up for a developer account or login if you already have one.
+            </p>
+            <p class="leading-8 text-sm">
+              - On my apps tab, create a new sandbox app and give it a name, select the products you want to map to the app and click on create app. You can't add products after the app is created, be sure to select the one's you need.
+            </p>
+            <p class="leading-8 text-sm">
+              - Your newly created app will appear and will list the products you selected, along with your credentials a
+              <span class="pre">consumer key</span> and a
+              <span class="pre">consumer secret</span>
+            </p>
+            <p class="leading-8 text-sm">
+              - Store this these in a <span class="pre">.env</span> or your credentials file.
+            </p>
+            <p class="leading-8 text-sm">
+              Here is a sample <span class="pre">.env</span>
+            </p>
+            <div class="pre p-5 flex flex-col">
+              <span>MPESA_CONSUMER_KEY='your consumer key'</span>
+              <span>MPESA_CONSUMER_SECRET='your consumer secret'</span>
+              <span>MPESA_SHORTCODE=174379</span>
+              <span>MPESA_PASSKEY=bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919</span>
+            </div>
+            <p class="leading-8 text-sm mt-4">
+              <span class="font-bold text-tertiary">NOTE</span>
+              <br />
+              - The <span class="pre uppercase">MPESA_SHORTCODE</span> and <span class="pre uppercase">MPESA_PASSKEY</span>  provided above are only for testing, to go live you'll have to get a shortcode (A Paybill, Buy Goods or Till Number) and passkey from M-pesa .
+              <br />
+              - <span class="pre uppercase">MPESA_PASSKEY</span> is only required if your app has Lipa na M-Pesa product or M-Pesa express product.
+            </p>
           </div>
-          <p class="leading-8 text-sm mt-4">
-            <span class="font-bold text-tertiary">NOTE</span>
-            <br />
-            - The <span class="pre uppercase">MPESA_SHORTCODE</span> and <span class="pre uppercase">MPESA_PASSKEY</span>  provided above are only for testing, to go live you'll have to get a shortcode (A Paybill, Buy Goods or Till Number) and passkey from M-pesa .
-            <br />
-            - <span class="pre uppercase">MPESA_PASSKEY</span> is only required if your app has Lipa na M-Pesa product or M-Pesa express product.
-          </p>
         </div>
+
+        <div class="flex flex-col gap-5">
+          <h5 class="font-bold text-lg">Ngrok</h5>
+          <div class='flex flex-col gap-2'>
+            <p class="leading-8 text-sm">
+            - We also need to set up a callback URL which needs to be a secure URL to receive notifications from M-Pesa
+            </p>
+            <p class="leading-8 text-sm">
+            - Since our localhost app is not secure we need to use ngrok to get a secure tunnel.
+            </p>
+            <p class="leading-8 text-sm">
+              - Go to <a href='https://ngrok.com' target='_blank' class='text-link'>ngrok</a> and sign up for a free account or login if you already have one.
+            </p>
+            <p class="leading-8 text-sm">
+            - Checkout their <a href='https://ngrok.com/download' target='_blank' class='text-link'>download</a> options depending on your OS.  To install on ubuntu <span class="pre">sudo snap install ngrok</span> or download the zip file from the website and extract it.
+            </p>
+            <p class="leading-8 text-sm">
+              - If it's your first download, connect your account to ngrok run <span class="pre">ngrok authtoken 'your authtoken'</span> and replace <span class="pre">'your authtoken'</span> with your authtoken.
+            </p>
+            <p class="leading-8 text-sm">
+            - To get you callback url in a new terminal run <span class="pre">ngrok http 'port number'</span> and replace <span class="pre"> port number </span> with the port number from your rails server.
+            </p>
+            <p class="leading-8 text-sm">
+            - Add a new <span class="pre">.env</span> variable <span class="pre">MPESA_CALLBACK_URL='your ngrok url'</span> and replace <span class="pre">'your ngok url'</span> with the url generated from ngrok.
+            </p>
+            <%= image_tag 'ngrok.png'%>
+            <p class="leading-8 text-sm mt-4">
+              <span class="font-bold text-tertiary">NOTE</span>
+              <br />
+              - The url generated by ngrok changes every time you run it, so you will need to update your <span class="pre">.env</span> file with the new url every time you stop and rerun ngrok.
+            </p>
+          </div>
+        </div>
+
       </div>
+
       <%= image_tag 'app.png'%>
   </div>
-
-  <%= render 'shared/bottom_nav' %>
+  <%= render 'shared/bottom_nav', text: 'What next after getting started ?' %>
 </div>
