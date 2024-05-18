@@ -6,9 +6,9 @@ class MpesasController < ApplicationController
   before_action :load_variables
   before_action :load_urls
 
-  include Mpesas::AccessRequest
-  include Mpesas::Stkpush
-  include Mpesas::Stkquery
+  include Mpesa::AccessRequest
+  include Mpesa::Stkpush
+  include Mpesa::Stkquery
 
   private
 

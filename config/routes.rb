@@ -8,6 +8,6 @@ Rails.application.routes.draw do
 
   get '/:action', to: 'home#action'
 
-  post '/stkpush', to: 'mpesas#stkpush'
-  post '/stkquery', to: 'mpesas#stkquery'
+  post '/stkpush', to: 'mpesa#stkpush'
+  post '/stkquery', to: 'mpesa#stkquery'
 end

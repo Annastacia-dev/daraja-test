@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Mpesas
+module Mpesa
   # Merchant initiated request (C2B), send a payment prompt on the customer's phone (Popularly known as STK Push Prompt)
   module Stkpush
     def stkpush

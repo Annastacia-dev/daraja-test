@@ -13,9 +13,7 @@
             <p class="text-sm"><%= product[:description] %></p>
           </div>
         </div>
-        <button class="bg-primary px-8 py-2 text-white lg:mt-10 capitalize text-sm font-semibold">
-          <%= link_to 'read tutorial', product[:path] %>
-        </button>
+        <%= link_to 'read tutorial', product[:path], class: "bg-primary px-8 py-2 text-white lg:mt-10 capitalize text-sm font-semibold text-center" %>
       </div>
     <% end %>
   </div>

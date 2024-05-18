@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Mpesas
+module Mpesa
   # Makes a request for a time bound access token to call allowed APIs
   module AccessRequest
     private
