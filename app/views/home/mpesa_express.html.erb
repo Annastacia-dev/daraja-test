@@ -55,7 +55,7 @@
       </div>
     </div>
 
-    <div class="flex flex-col gap-5">
+    <div class="flex flex-col gap-10">
       <div class="bg-white shadow-lg rounded-lg p-6 w-80">
         <h2 class="text-2xl font-bold mb-4 text-center">Try it Out</h2>
         <%= form_with url: stkpush_path, method: :post, local: true do |form| %>
@@ -71,8 +71,103 @@
             <%= form.submit 'Submit', class: 'bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-5 cursor-pointer' %>
         <% end %>
       </div>
+
+      <div class="bg-center bg-cover bg-no-repeat shadow-lg rounded-lg p-6 w-80 lg:h-[500px] h-96 relative" style="background-image: url('<%= image_path('wallpaper.jpeg') %>')">
+        <div class="bg-black/40 w-80 lg:h-[500px] h-96 absolute top-0 left-0 rounded-lg p-3 text-white text-sm">
+          <div class="flex justify-between">
+            <div class="flex gap-4 items-center">
+              <span class="font-bold" id="current-time"><%= Time.now.strftime("%H:%M:%S") %></span>
+              <i class="fa-solid fa-image"></i>
+            </div>
+            <div class="flex gap-4 items-center">
+              <i class="fa-solid fa-wifi"></i>
+              <i class="fa-solid fa-battery-full"></i>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg text-gray-900 p-4 mt-12 flex flex-col gap-4">
+            <p> Do you want to pay Kshs. 100 to Daraja-Sandbox Account no. CompanyXLTD? </p>
+            <p> Enter M-PESA PIN: </p>
+            <input type="password" class="border-b-2 border-t-0 border-l-0 border-r-0"/>
+          </div>
+          <%= image_tag 'keyboard.jpeg', class: 'absolute left-0 bottom-0' %>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <div class="lg:w-3/4">
+    <p class="leading-8 text-sm">
+      - We first need to update our <span>load_variable</span> method to fetch some more variables
+      <div class="pre p-3 lg w-3/4 my-2">
+        def load_variables
+          <br />
+          <span class="ml-4">@consumer_key = ENV.fetch('MPESA_CONSUMER_KEY')</span>
+          <br />
+          <span class="ml-4">@consumer_secret = ENV.fetch('MPESA_CONSUMER_SECRET')</span>
+          <br />
+          <span class="ml-4">@short_code = ENV.fetch('MPESA_SHORTCODE')</span>
+          <br />
+          <span class="ml-4">@passkey = ENV.fetch('MPESA_PASSKEY')</span>
+          <br />
+          <span class="ml-4">@timestamp = Time.now.strftime('%Y%m%d%H%M%S').to_s</span>
+          <br />
+          <span class="ml-4">@password = Base64.strict_encode64("#{@short_code}#{@passkey}#{@timestamp}")</span>
+          <br />
+          <span class="ml-4">@userpass = Base64.strict_encode64("#{@consumer_key}:#{@consumer_secret}")</span>
+          <br />
+        end
+      </div>
+    </p>
+    <p class="leading-8 text-sm">
+      - Create a concern file <span class="pre">app/controllers/concerns/stkpush.rb</span> and include it in the <span class="pre"> mpesa_controller </span> <span class="pre ml-1"> include Mpesa::StkPush</span>
+      - Here we are going to define a method <sspan>stkpush</span> that makes a query to the stkpush endpoint
+
+      <div class="pre p-4">
+        module Mpesa
+        <br/>
+        <span class="ml-4">module Stkpush</span>
+        <br/>
+        <span class="ml-8">def stkpush</span>
+        <br/>
+        <span class="ml-12">phone_number = params[:phone_number]</span>
+        <br/>
+        <span class="ml-12">amount = params[:amount]</span>
+        <br/>
+        <span class="ml-12">payload = generate_stkpush_payload(phone_number, amount)</span>
+        <br/>
+        <span class="ml-12">headers = generate_headers</span>
+        <br/>
+        <span class="ml-12">response = send_stkpush_request(payload, headers)</span>
+        <br />
+        <span class="ml-12">render json: response</span>
+        <br />
+        <span class="ml-8">end</span>
+        <br />
+        <span class="ml-4">end</span>
+        <br />
+        end
+      </div>
+    </p>
   </div>
 
   <%= render 'shared/bottom_nav', text: 'Explore other products integration' %>
 </div>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function() {
+    function updateTime() {
+      var currentTime = new Date();
+      var hours = currentTime.getHours().toString().padStart(2, '0');
+      var minutes = currentTime.getMinutes().toString().padStart(2, '0');
+      var seconds = currentTime.getSeconds().toString().padStart(2, '0');
+      var timeString = hours + ':' + minutes + ':' + seconds;
+      document.getElementById('current-time').innerText = timeString;
+    }
+
+    updateTime(); // Update the time immediately
+
+    // Update the time every second
+    setInterval(updateTime, 1000);
+  });
+</script>
