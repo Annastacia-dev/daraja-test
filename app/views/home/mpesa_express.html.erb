@@ -1,0 +1,173 @@
+<div class="pt-10 px-5 flex flex-col gap-10">
+  <h1 class="text-2xl  tracking-wide text-green-500 capitalize"> M-pesa express </h1>
+  <p class="text-sm"> - This is a Merchant/Business initiated C2B (Customer to Business) Payment.</p>
+  <p class="text-sm"> - It has two parts to it, sending the payment prompt & making a query to check the status of the request.</p>
+
+  <div class="grid lg:grid-cols-3 lg:gap-20 gap-5">
+    <div class="flex flex-col gap-5 col-span-2">
+      <h5 class="font-bold text-lg">Sending the prompt</h5>
+      <div class='flex flex-col gap-2'>
+        <p class="leading-8 text-sm">
+          - Making a simulation on the <a href="https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate" class="text-link" target="_blank">daraja portal</a>, we see that we need to pass a few things:
+          <ol class="text-sm flex flex-col gap-2">
+            <li class="font-semibold"> Headers </li>
+            <p> - A key <span>Authorization</span> with a value of Bearer + the access token</p>
+            <li class="font-semibold"> Body (JSON) </li>
+            <div class="pre p-3">
+              {
+                <br/>
+                "BusinessShortCode": 174379, - (organization's shortcode (Paybill or Buygoods - A 5 to 6-digit account number) used to identify an organization and receive the transaction.)
+                <br/>
+                <br/>
+                "Password": "your password", -(A base64 encoded string. (The base64 string is a combination of Shortcode+Passkey+Timestamp))
+                <br/>
+                <br/>
+                "Timestamp": "20240518203935", - (current time of the transaction in the format YYYYMMDDHHMMSS)
+                <br/>
+                <br/>
+                "TransactionType": "CustomerPayBillOnline", - ("CustomerPayBillOnline" for PayBill Numbers and "CustomerBuyGoodsOnline" for Till Numbers.)
+                <br/>
+                <br/>
+                "Amount": 1, - (Amount transacted normally a numeric value. Only whole numbers are supported.)
+                <br/>
+                <br/>
+                "PartyA": 2547xxxxxxxx, - (The phone number sending money.A Valid Safaricom Mobile Number that is M-PESA registered in the format 2547XXXXXXXX)
+                <br/>
+                <br/>
+                "PartyB": 174379, - (Same as the BusinessShortCode value above)
+                <br/>
+                <br/>
+                "PhoneNumber": 2547xxxxxxxx, -(Mobile Number to receive the STK Pin Prompt. Can be the same as PartyA value above.)
+                <br/>
+                <br/>
+                "CallBackURL": "https://mydomain.com/path", -(A valid secure URL that is used to receive notifications from M-Pesa API)
+                <br/>
+                <br/>
+                "AccountReference": "CompanyXLTD", -(Identifier of the transaction for the transaction displayed to the customer in the STK Pin Prompt message. Maximum of 12 alphanumeric characters.)
+                <br/>
+                <br/>
+                "TransactionDesc": "Payment of X" - (Additional information/comment that can be sent along with the request from your system. Maximum of 13 Characters.)
+                <br/>
+              }
+            </div>
+          </ol>
+        </p>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-10">
+      <div class="bg-white shadow-lg rounded-lg p-6 w-80">
+        <h2 class="text-2xl font-bold mb-4 text-center">Try it Out</h2>
+        <%= form_with url: stkpush_path, method: :post, local: true do |form| %>
+            <div class="mb-4">
+              <%= form.label :phone_number, class: 'block text-gray-700 text-sm font-bold mb-2' %>
+              <%= form.text_field :phone_number, placeholder: 'e.g. 2547xxxxxxx', class: 'appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', required: true %>
+            </div>
+            <div class="mb-4">
+              <%= form.label :amount, class: 'block text-gray-700 text-sm font-bold mb-2' %>
+              <%= form.number_field :amount, placeholder: 'e.g., 100', class: 'appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline', required: true %>
+            </div>
+
+            <%= form.submit 'Submit', class: 'bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mt-5 cursor-pointer' %>
+        <% end %>
+      </div>
+
+      <div class="bg-center bg-cover bg-no-repeat shadow-lg rounded-lg p-6 w-80 lg:h-[500px] h-96 relative" style="background-image: url('<%= image_path('wallpaper.jpeg') %>')">
+        <div class="bg-black/40 w-80 lg:h-[500px] h-96 absolute top-0 left-0 rounded-lg p-3 text-white text-sm">
+          <div class="flex justify-between">
+            <div class="flex gap-4 items-center">
+              <span class="font-bold" id="current-time"><%= Time.now.strftime("%H:%M:%S") %></span>
+              <i class="fa-solid fa-image"></i>
+            </div>
+            <div class="flex gap-4 items-center">
+              <i class="fa-solid fa-wifi"></i>
+              <i class="fa-solid fa-battery-full"></i>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg text-gray-900 p-4 mt-12 flex flex-col gap-4">
+            <p> Do you want to pay Kshs. 100 to Daraja-Sandbox Account no. CompanyXLTD? </p>
+            <p> Enter M-PESA PIN: </p>
+            <input type="password" class="border-b-2 border-t-0 border-l-0 border-r-0"/>
+          </div>
+          <%= image_tag 'keyboard.jpeg', class: 'absolute left-0 bottom-0' %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lg:w-3/4">
+    <p class="leading-8 text-sm">
+      - We first need to update our <span>load_variable</span> method to fetch some more variables
+      <div class="pre p-3 lg w-3/4 my-2">
+        def load_variables
+          <br />
+          <span class="ml-4">@consumer_key = ENV.fetch('MPESA_CONSUMER_KEY')</span>
+          <br />
+          <span class="ml-4">@consumer_secret = ENV.fetch('MPESA_CONSUMER_SECRET')</span>
+          <br />
+          <span class="ml-4">@short_code = ENV.fetch('MPESA_SHORTCODE')</span>
+          <br />
+          <span class="ml-4">@passkey = ENV.fetch('MPESA_PASSKEY')</span>
+          <br />
+          <span class="ml-4">@timestamp = Time.now.strftime('%Y%m%d%H%M%S').to_s</span>
+          <br />
+          <span class="ml-4">@password = Base64.strict_encode64("#{@short_code}#{@passkey}#{@timestamp}")</span>
+          <br />
+          <span class="ml-4">@userpass = Base64.strict_encode64("#{@consumer_key}:#{@consumer_secret}")</span>
+          <br />
+        end
+      </div>
+    </p>
+    <p class="leading-8 text-sm">
+      - Create a concern file <span class="pre">app/controllers/concerns/stkpush.rb</span> and include it in the <span class="pre"> mpesa_controller </span> <span class="pre ml-1"> include Mpesa::StkPush</span>
+      - Here we are going to define a method <sspan>stkpush</span> that makes a query to the stkpush endpoint
+
+      <div class="pre p-4">
+        module Mpesa
+        <br/>
+        <span class="ml-4">module Stkpush</span>
+        <br/>
+        <span class="ml-8">def stkpush</span>
+        <br/>
+        <span class="ml-12">phone_number = params[:phone_number]</span>
+        <br/>
+        <span class="ml-12">amount = params[:amount]</span>
+        <br/>
+        <span class="ml-12">payload = generate_stkpush_payload(phone_number, amount)</span>
+        <br/>
+        <span class="ml-12">headers = generate_headers</span>
+        <br/>
+        <span class="ml-12">response = send_stkpush_request(payload, headers)</span>
+        <br />
+        <span class="ml-12">render json: response</span>
+        <br />
+        <span class="ml-8">end</span>
+        <br />
+        <span class="ml-4">end</span>
+        <br />
+        end
+      </div>
+    </p>
+  </div>
+
+  <%= render 'shared/bottom_nav', text: 'Explore other products integration' %>
+</div>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function() {
+    function updateTime() {
+      var currentTime = new Date();
+      var hours = currentTime.getHours().toString().padStart(2, '0');
+      var minutes = currentTime.getMinutes().toString().padStart(2, '0');
+      var seconds = currentTime.getSeconds().toString().padStart(2, '0');
+      var timeString = hours + ':' + minutes + ':' + seconds;
+      document.getElementById('current-time').innerText = timeString;
+    }
+
+    updateTime(); // Update the time immediately
+
+    // Update the time every second
+    setInterval(updateTime, 1000);
+  });
+</script>

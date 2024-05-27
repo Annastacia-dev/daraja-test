@@ -4,8 +4,11 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Defines the root path route ("/")
-  # root "articles#index"
+  root "home#index"
 
-  post '/stkpush', to: 'mpesas#stkpush'
-  post '/stkquery', to: 'mpesas#stkquery'
+  get '/:action', to: 'home#action'
+  get '/mpesa_express', to: 'home#mpesa_express'
+
+  post '/stkpush', to: 'mpesa#stkpush', as: 'stkpush'
+  post '/stkquery', to: 'mpesa#stkquery', as: 'stkquery'
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Mpesas
+module Mpesa
   # Check the status of a Lipa Na M-Pesa Online Payment.
   module Stkquery
     extend ActiveSupport::Concern

@@ -1,0 +1,14 @@
+<nav class="pt-20 pb-10">
+    <h5 class="font-semibold text-primary">  <%= text.try(:presence) || "More Links" %> </h5>
+   <hr class="my-6" />
+  <ul class="flex gap-10">
+    <% bottom_links.each_with_index do |link, index| %>
+      <% if link[:path] != action_name %>
+        <a href="<%= link[:path] %>" class="underline text-sm hover:text-tertiary capitalize"><%= link[:title] %></a>
+        <% if index != bottom_links.length - 1 %>
+          <span>|</span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </ul>
+</nav>
