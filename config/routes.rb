@@ -11,4 +11,5 @@ Rails.application.routes.draw do
 
   post '/stkpush', to: 'mpesa#stkpush', as: 'stkpush'
   post '/stkquery', to: 'mpesa#stkquery', as: 'stkquery'
+  post '/callback', to: 'mpesa#callback', as: 'callback'
 end

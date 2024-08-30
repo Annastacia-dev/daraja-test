@@ -40,7 +40,7 @@ module Mpesa
         PartyA: phone_number,
         PartyB: @short_code,
         PhoneNumber: phone_number,
-        CallBackURL: "#{@callback_url}/callback_url",
+        CallBackURL: "#{@callback_url}/callback",
         AccountReference: 'Rails Daraja',
         TransactionDesc: 'Integration of Daraja API in Rails'
       }.to_json

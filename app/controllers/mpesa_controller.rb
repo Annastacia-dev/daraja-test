@@ -10,6 +10,9 @@ class MpesaController < ApplicationController
   include Mpesa::Stkpush
   include Mpesa::Stkquery
 
+  def callback
+  end
+
   private
 
   def load_variables
